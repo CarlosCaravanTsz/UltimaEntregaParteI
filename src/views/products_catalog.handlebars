@@ -1,0 +1,22 @@
+<div id="catalog-container">
+    <h2>Products Catalog</h2>
+    <a href="/edit-products">Edit Products</a>
+</div>
+<hr>
+
+
+<div class="container">
+    <main class="grid">
+        {{#each products}}
+        <article>
+            <img src={{this.thumbnail}}>
+            <div class="text">
+                <h3>{{this.name}}</h3>
+                <p>ID: {{this.id}}</p>
+                <p>{{this.description}}</p>
+                <a href="#pending">Add to cart</a>
+            </div>
+        </article>
+        {{/each}}
+    </main>
+</div>
