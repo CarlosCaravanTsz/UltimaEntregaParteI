@@ -16,34 +16,38 @@ router.get('/', (req, res) => {
 router.get('/products', async (req, res) => {
     const page = parseInt(req.query?.page || 1);
     const limit = parseInt(req.query?.limit || 10);
-    const queryParams = req.query?.query || '';
+    const pre_query = {
+        name: req.query?.name ,
+        code: req.query?.code ,
+        stock: req.query?.stock ? {$gt: 0} : 0,
+        category: req.query?.category,
+    };
+
     const query = {};
-    if (queryParams) {
-        const field = queryParams.split(',')[0];
-        let value = queryParams.split(",")[1];
 
-        if (!isNaN(parseInt(value))) value = parseInt(value)
-        query[field] = value
-    }
-    
-    console.log(query);
+    for (let key in pre_query) {
+        if (pre_query[key]) query[key] = pre_query[key];
+    };
 
-    if (query) {
-        const products = await productModel.paginate(query, {
-            page,
-            limit,
-            lean: true
-        });
-        console.log("products", products["docs"]);
-        let pr = products['docs']
-        res.render("products_catalog", { pr });
-    } else {
-        const products = await productModel.find().lean();
-        console.log('products', products);
-        res.render("products_catalog", { products });
+    const result = await productModel.paginate(query, {
+      page,
+      limit,
+      sort: req.query.price == "Mayor a Menor" ? { price: -1 } : { price: 1 },
+      lean: true,
+    });
 
-    }
+    result.prevLink = result.hasPrevPage
+      ? `/products?page=${result.prevPage}&limit=${limit}`
+      : "";
 
+    result.nextLink = result.hasNextPage
+      ? `/products?page=${result.nextPage}&limit=${limit}`
+    : "";
+  
+  console.log(result)
+
+    //res.render("products_catalog", { products });
+    res.render("products_catalog", result);
 });
 
 

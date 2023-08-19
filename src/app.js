@@ -36,6 +36,11 @@ const httpServer = app.listen(PORT, () =>
 
 const URL = "mongodb+srv://carloscara28:DnERG59KflAo9jen@carlosbackenddb.44mn6xw.mongodb.net/?retryWrites=true&w=majority";
 
+
+function add_id(array) {
+    return array.length ? array.length+1 : 1
+}
+
 mongoose
     .connect(URL, { dbName: "ecommerce" })
     .then(() => console.log("Connected to e-commerce DB..."))
@@ -53,10 +58,16 @@ mongoose
                 if (operation == "add") {
 
                     data.status = true;
+
+                    let products = await productModel.find().lean();
+
+                    data.id= add_id(products);
+
                     console.log('Product to create: ', data);
                     await productModel.create(data);
 
-                    const products = await productModel.find().lean();
+                    products = await productModel.find().lean();
+
                     socket.emit("reload-table", products);
 
                 } else if (operation == "update") {

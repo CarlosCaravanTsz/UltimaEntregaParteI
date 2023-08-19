@@ -1,17 +1,29 @@
 import mongoose from 'mongoose';
 import mongoosePaginate from 'mongoose-paginate-v2';
 
-
 const cartCollection = 'carts';
 
 const cartSchema = new mongoose.Schema({
-    products: {
-        type: Array,
-        default: []
-    },
-    quantity: Number
+    id: Number,
+    products: [
+        {
+            p_id: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "products"
+            },
+            pid: Number,
+            quantity: Number,
+        },
+    ],
 });
+
+//cartSchema.pre("findOne", function () {
+// this.populate("products.product");
+//}); // Middleware para el esquema
 
 //cartSchema.plugin(mongoosePaginate);
 
-export default mongoose.model(cartCollection, cartSchema);
+const cartModel = mongoose.model(cartCollection, cartSchema);
+
+
+export default cartModel;
